@@ -103,20 +103,24 @@ class baxter_kinematics(object):
                 mat[i,j] = data[i,j]
         return mat
 
-    def forward_position_kinematics(self):
+    def forward_position_kinematics(self, joint_positions=None):
         end_frame = PyKDL.Frame()
-        self._fk_p_kdl.JntToCart(self.joints_to_kdl('positions'),
-                                 end_frame)
+        if joint_positions:
+            self.fk_p_kdl.JntToCart(joint_positions, end_frame)
+        else:
+            self._fk_p_kdl.JntToCart(self.joints_to_kdl('positions'), end_frame)
         pos = end_frame.p
         rot = PyKDL.Rotation(end_frame.M)
         rot = rot.GetQuaternion()
         return np.array([pos[0], pos[1], pos[2],
                          rot[0], rot[1], rot[2], rot[3]])
 
-    def forward_velocity_kinematics(self):
+    def forward_velocity_kinematics(self, joint_velocities=None):
         end_frame = PyKDL.FrameVel()
-        self._fk_v_kdl.JntToCart(self.joints_to_kdl('velocities'),
-                                 end_frame)
+        if joint_velocities:
+            self._fk_v_kdl.JntToCart(joint_velocities, end_frame)
+        else:
+            self._fk_v_kdl.JntToCart(self.joints_to_kdl('velocities'), end_frame)
         return end_frame.GetTwist()
 
     def inverse_kinematics(self, position, orientation=None, seed=None):
