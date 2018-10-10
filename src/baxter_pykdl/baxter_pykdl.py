@@ -164,7 +164,6 @@ class baxter_kinematics(object):
     def jacobian_pseudo_inverse(self):
         return np.linalg.pinv(self.jacobian())
 
-
     def inertia(self):
         inertia = PyKDL.JntSpaceInertiaMatrix(self._num_jnts)
         self._dyn_kdl.JntToMass(self.joints_to_kdl('positions'), inertia)
