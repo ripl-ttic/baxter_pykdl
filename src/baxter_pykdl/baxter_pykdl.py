@@ -106,7 +106,7 @@ class baxter_kinematics(object):
     def forward_position_kinematics(self, joint_positions=None):
         end_frame = PyKDL.Frame()
         if joint_positions:
-            self.fk_p_kdl.JntToCart(joint_positions, end_frame)
+            self._fk_p_kdl.JntToCart(joint_positions, end_frame)
         else:
             self._fk_p_kdl.JntToCart(self.joints_to_kdl('positions'), end_frame)
         pos = end_frame.p
