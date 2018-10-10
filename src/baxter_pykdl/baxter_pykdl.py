@@ -96,6 +96,13 @@ class baxter_kinematics(object):
             kdl_array = PyKDL.JntArrayVel(kdl_array)
         return kdl_array
 
+    def joint_vals_to_kdl(self, data):
+        assert (len(data) == self._num_jnts)
+        kdl_array = PyKDL.JntArray(self._num_jnts)
+        for idx, val in enumerate(data):
+            kdl_array[idx] = val
+        return kdl_array
+
     def kdl_to_mat(self, data):
         mat =  np.mat(np.zeros((data.rows(), data.columns())))
         for i in range(data.rows()):
@@ -106,7 +113,7 @@ class baxter_kinematics(object):
     def forward_position_kinematics(self, joint_positions=None):
         end_frame = PyKDL.Frame()
         if joint_positions:
-            self._fk_p_kdl.JntToCart(joint_positions, end_frame)
+            self._fk_p_kdl.JntToCart(self.joint_vals_to_kdl(joint_positions), end_frame)
         else:
             self._fk_p_kdl.JntToCart(self.joints_to_kdl('positions'), end_frame)
         pos = end_frame.p
@@ -118,7 +125,9 @@ class baxter_kinematics(object):
     def forward_velocity_kinematics(self, joint_velocities=None):
         end_frame = PyKDL.FrameVel()
         if joint_velocities:
-            self._fk_v_kdl.JntToCart(joint_velocities, end_frame)
+            if type(joint_velocities) == PyKDL.JntArray:
+                joint_velocities = PyKDL.JntArrayVel(joint_velocities)
+            self._fk_v_kdl.JntToCart(self.joint_vals_to_kdl(joint_velocities), end_frame)
         else:
             self._fk_v_kdl.JntToCart(self.joints_to_kdl('velocities'), end_frame)
         return end_frame.GetTwist()
